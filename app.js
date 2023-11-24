@@ -41,3 +41,65 @@ app.get("/v1/users", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+
+
+
+import {useState, useEffect} from 'react'
+
+function App() {
+  const [users, setUsers] = useState([])
+  const [searchText, setSearchText] = useState('')
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/v1/users?searchText=${searchText}`)
+        setUsers(response.data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchData()
+  }, [searchText])
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Search by name"
+        value={searchText}
+        onChange={e => setSearchText(e.target.value)}
+      />
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Posts</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map(user => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>
+                <ul>
+                  {user.posts.map(post => (
+                    <li key={post.id}>{post.title}</li>
+                  ))}
+                </ul>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+export default App
+
